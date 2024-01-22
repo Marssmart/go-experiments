@@ -4,14 +4,14 @@ import "testing"
 import "go-experiments/dataStructures"
 
 func TestCreation(t *testing.T) {
-	var list = dataStructures.LinkedList[int]{}
+	var list = dataStructures.NewLinkedList[int]()
 	if list.Size() != 0 {
 		t.Fatalf("Should have been 0")
 	}
 }
 
 func TestAdding(t *testing.T) {
-	var list = dataStructures.LinkedList[int]{}
+	var list = dataStructures.NewLinkedList[int]()
 	if list.Size() != 0 {
 		t.Fatalf("Should have been 0")
 	}
@@ -33,8 +33,8 @@ func TestAdding(t *testing.T) {
 	}
 }
 
-func TestRemoving(t *testing.T) {
-	var list = dataStructures.LinkedList[int]{}
+func TestRemovingAll(t *testing.T) {
+	var list = dataStructures.NewLinkedList[int]()
 	list.Add(7)
 	list.Add(5)
 	list.Add(54)
@@ -42,8 +42,29 @@ func TestRemoving(t *testing.T) {
 		t.Fatalf("Not added properly")
 	}
 
-	list.Remove(5)
+	list.RemoveAll(5)
 	if list.Size() != 2 && !list.ContainsAll(7, 54) || list.Contains(5) {
+		t.Fatalf("Not removed properly")
+	}
+}
+
+func TestRemovingFirst(t *testing.T) {
+	var list = dataStructures.NewLinkedList[int]()
+	list.Add(7)
+	list.Add(5)
+	list.Add(54)
+	list.Add(5)
+	list.Add(54)
+	list.Add(54)
+
+	if list.Size() != 6 || !list.ContainsAll(5, 7, 54) {
+		t.Fatalf("Not added properly")
+	}
+
+	list.RemoveFirst(5)
+	list.RemoveFirst(54)
+	list.RemoveFirst(54)
+	if list.Size() != 3 || !list.ContainsAll(5, 7, 54) {
 		t.Fatalf("Not removed properly")
 	}
 }
@@ -57,7 +78,7 @@ func TestLargeCollectionAdd(t *testing.T) {
 }
 
 func CreateBackLoadedListOfSize(size int) dataStructures.LinkedList[int] {
-	var list = dataStructures.LinkedList[int]{}
+	var list = dataStructures.NewLinkedList[int]()
 	nums := make([]int, size)
 	for i := range nums {
 		list.Add(i)
@@ -105,7 +126,7 @@ func safeGet(t *testing.T, list dataStructures.LinkedList[int], index int) {
 }
 
 func createFrontLoadedListOfSize(size int) dataStructures.LinkedList[int] {
-	var list = dataStructures.LinkedList[int]{}
+	var list = dataStructures.NewLinkedList[int]()
 	nums := make([]int, size)
 	for i := range nums {
 		list.AddFirst(i)

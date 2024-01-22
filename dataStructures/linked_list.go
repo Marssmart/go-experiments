@@ -5,7 +5,28 @@ import (
 	"fmt"
 )
 
-type LinkedList[T comparable] struct {
+type Node[T comparable] interface {
+	Next() Node[T]
+	Value() T
+}
+
+type LinkedList[T comparable] interface {
+	Head() Node[T]
+	Size() int
+	AddFirst(value T)
+	Add(value T)
+	RemoveAll(value T)
+	RemoveFirst(value T)
+	Contains(value T) bool
+	ContainsAll(value ...T) bool
+	Get(index int) (T, bool, error)
+}
+
+func NewLinkedList[T comparable]() LinkedList[T] {
+	return &linkedList[T]{}
+}
+
+type linkedList[T comparable] struct {
 	head *node[T]
 }
 
@@ -14,7 +35,19 @@ type node[T comparable] struct {
 	value T
 }
 
-func (r *LinkedList[T]) Size() int {
+func (n *node[T]) Next() Node[T] {
+	return n.next
+}
+
+func (n *node[T]) Value() T {
+	return n.value
+}
+
+func (r *linkedList[T]) Head() Node[T] {
+	return r.head
+}
+
+func (r *linkedList[T]) Size() int {
 	if r.head == nil {
 		return 0
 	} else {
@@ -28,7 +61,7 @@ func (r *LinkedList[T]) Size() int {
 	}
 }
 
-func (r *LinkedList[T]) AddFirst(value T) {
+func (r *linkedList[T]) AddFirst(value T) {
 	if r.head == nil {
 		r.head = &node[T]{value: value}
 		return
@@ -40,7 +73,7 @@ func (r *LinkedList[T]) AddFirst(value T) {
 }
 
 // Add warning : extremely slow
-func (r *LinkedList[T]) Add(value T) {
+func (r *linkedList[T]) Add(value T) {
 	if r.head == nil {
 		r.head = &node[T]{value: value}
 		return
@@ -54,7 +87,7 @@ func (r *LinkedList[T]) Add(value T) {
 	head.next = &last
 }
 
-func (r *LinkedList[T]) Remove(value T) {
+func (r *linkedList[T]) RemoveAll(value T) {
 	prev := (*node[T])(nil)
 	current := r.head
 	for current != nil {
@@ -71,7 +104,25 @@ func (r *LinkedList[T]) Remove(value T) {
 	}
 }
 
-func (r *LinkedList[T]) Contains(value T) bool {
+func (r *linkedList[T]) RemoveFirst(value T) {
+	prev := (*node[T])(nil)
+	current := r.head
+	for current != nil {
+		if current.value == value {
+			if prev != nil {
+				prev.next = current.next
+			} else {
+				r.head = current.next
+				current = r.head
+			}
+			return
+		}
+		prev = current
+		current = current.next
+	}
+}
+
+func (r *linkedList[T]) Contains(value T) bool {
 	if r.Size() == 0 {
 		return false
 	}
@@ -85,7 +136,7 @@ func (r *LinkedList[T]) Contains(value T) bool {
 	return false
 }
 
-func (r *LinkedList[T]) Get(index int) (T, bool, error) {
+func (r *linkedList[T]) Get(index int) (T, bool, error) {
 	size := r.Size()
 	if index > size-1 && size > 0 {
 		return *new(T), false, errors.New(fmt.Sprintf("Index %v out of bounds", index))
@@ -100,7 +151,7 @@ func (r *LinkedList[T]) Get(index int) (T, bool, error) {
 	return current.value, true, nil
 }
 
-func (r *LinkedList[T]) ContainsAll(value ...T) bool {
+func (r *linkedList[T]) ContainsAll(value ...T) bool {
 	if r.Size() == 0 {
 		return false
 	}
